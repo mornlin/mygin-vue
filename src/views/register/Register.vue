@@ -57,7 +57,12 @@ export default {
   },
   methods: {
     register() {
-      console.log("register");
+      const api = "http://localhost:8088/api/auth/register";
+      this.axios.post(api, { ...this.user }).then((res) => {
+        console.log(res.data);
+      }).catch((err) => {
+        console.log("err:", err.response.data.msg);
+      });
     },
   },
 };
