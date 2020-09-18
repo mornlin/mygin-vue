@@ -53,7 +53,6 @@
 </template>
 <script>
 import { required, minLength, maxLength } from "vuelidate/lib/validators";
-import storageService from "@/service/storageService";
 import userService from "@/service/userService";
 
 export default {
@@ -89,14 +88,17 @@ export default {
       return $dirty ? !$error : null;
     },
     register() {
+      this.$v.user.$touch();
+      if (this.$v.user.$anyError) {
+        return;
+      }
       userService.register(this.user).then((res) => {
-        storageService.set(storageService.USER_TOKEN, res.data.data.token);
-        userService.info().then((response) => {
-          storageService.set(storageService.USER_INFO, JSON.stringify(response.data.data.user));
-          this.$router.replace({ name: "Home" });
-        });
+        this.$store.commit("userModule/SET_TOKEN", res.data.data.token);
+        return userService.info();
+      }).then((response) => {
+        this.$store.commit("userModule/SET_USERINFO", response.data.data.user);
+        this.$router.replace({ name: "Home" });
       }).catch((err) => {
-        // console.log("err:", err.response.data.msg);
         this.$bvToast.toast(err.response.data.msg, {
           title: "数据验证错误",
           variant: "danger",

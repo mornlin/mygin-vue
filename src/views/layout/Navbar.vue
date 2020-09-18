@@ -35,12 +35,10 @@
     </div>
 </template>
 <script>
-import storageService from "@/service/storageService";
-
 export default {
   computed: {
     userInfo() {
-      return JSON.parse(storageService.get(storageService.USER_INFO));
+      return this.$store.state.userModule.userInfo;
     },
   },
 };
